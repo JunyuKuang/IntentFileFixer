@@ -9,18 +9,47 @@ import Cocoa
 
 class ViewController: NSViewController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
-
-    override var representedObject: Any? {
-        didSet {
-        // Update the view, if already loaded.
+    @IBAction func selectReceiptFile(_ sender: Any) {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = true
+        
+        panel.beginSheetModal(for: view.window!) { response in
+            guard response == .OK else {
+                return
+            }
+            for url in panel.urls where url.pathExtension == "swift" {
+                print(url.path)
+                
+                if url.startAccessingSecurityScopedResource() {
+                    DispatchQueue.main.async {
+                        url.stopAccessingSecurityScopedResource()
+                    }
+                }
+                self.handleFile(at: url)
+            }
         }
     }
-
-
+    
+    func handleFile(at fileURL: URL) {
+        do {
+            var string = try String(contentsOfFile: fileURL.path, encoding: .utf8)
+            string = string.replacingOccurrences(of: "internal ", with: "public ")
+            
+            // @available(iOS 15.0, macOS 12.0, watchOS 8.0, *)
+            // @objc(handleSearchTwitter:completion:)
+            // func handle(intent: KJYSearchTwitterIntent) async -> KJYSearchTwitterIntentResponse
+            
+            while let asyncIndex = string.range(of: " async ")?.lowerBound,
+                  let lastNewLineIndex = string.range(of: "\n", range: asyncIndex..<string.endIndex)?.lowerBound,
+                  let availableIndex = string.range(of: "@available", options: .backwards, range: string.startIndex..<asyncIndex)?.lowerBound,
+                  let firstNewLineIndex = string.range(of: "\n", options: .backwards, range: string.startIndex..<availableIndex)?.upperBound
+            {
+                string.removeSubrange(firstNewLineIndex..<lastNewLineIndex)
+            }
+            try string.data(using: .utf8)!.write(to: fileURL, options: .atomic)
+        } catch {
+            presentError(error)
+        }
+    }
 }
 
