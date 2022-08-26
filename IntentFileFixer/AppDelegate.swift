@@ -3,6 +3,7 @@
 //  IntentFileFixer
 //
 //  Created by Jonny Kuang on 8/6/22.
+//  Copyright © 2022 Jonny Kuang. All rights reserved. MIT license.
 //
 
 import Cocoa

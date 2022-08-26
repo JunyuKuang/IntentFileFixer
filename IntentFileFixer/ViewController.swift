@@ -3,6 +3,7 @@
 //  IntentFileFixer
 //
 //  Created by Jonny Kuang on 8/6/22.
+//  Copyright © 2022 Jonny Kuang. All rights reserved. MIT license.
 //
 
 import Cocoa
@@ -33,8 +34,10 @@ class ViewController: NSViewController {
     func handleFile(at fileURL: URL) {
         do {
             var string = try String(contentsOfFile: fileURL.path, encoding: .utf8)
-            string = string.replacingOccurrences(of: "internal ", with: "public ")
             
+            // string = string.replacingOccurrences(of: "internal ", with: "public ") // optionally make every Intent API public
+            
+            // MARK: Find and remove all async APIs
             // @available(iOS 15.0, macOS 12.0, watchOS 8.0, *)
             // @objc(handleSearchTwitter:completion:)
             // func handle(intent: KJYSearchTwitterIntent) async -> KJYSearchTwitterIntentResponse
